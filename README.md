@@ -10,10 +10,6 @@ An 'entity' is something that is derived from your models, or more typically col
 
 A 'lifecycle' is a description of how an entity is created, updated by a model, and destroyed.
 
-## Use Case: Google Maps
-
-You may have `PointOfInterest` models which you want to map to `Marker` object. The binding between the two is managed through a EntityLifecycle object:
-
 ```typescript
 export interface EntityLifecycle<TModel, TEntity, TContext> {
     /**
@@ -32,10 +28,11 @@ export interface EntityLifecycle<TModel, TEntity, TContext> {
      */
     destroy(model: TModel, entity: TEntity, context?: TContext): void;
 }
-
 ```
 
-For example:
+## Use Case: Google Maps
+
+The original purpose of these utilities was to bind models to Google Maps entities. For example, you may have a `PointOfInterest` model which you want to map to a Google Maps' `Marker`. The binding between the two can be defined with an `EntityLifecycle` object:
 
 ```typescript
 import { observable } from 'mobx';
@@ -50,29 +47,31 @@ class PointOfInterest {
     @observable public position: [number, number];
 }
 
-const myMap = new google.maps.Map(...);
+function createPoiMarkerLifecycle(map: google.maps.Map): EntityLifecycle<PointOfInterest, google.maps.Marker, void> {
+    return {
+        create(model) {
+            // `create` is called in order to create a Marker for your model. Note that `update` is always called immediately
+            // following `create` so the only code needed here is that specific to the creation of the entity, not necessarily
+            // the whole initialization
+            return new google.maps.Marker({ map });
+        },
+        update(model, entity) {
+            // The library will wrap `update` in an `autorun`, causing it to rerun every time the applicable parts of
+            // your model changes. Google Maps' Marker has a `setOptions` method which allows us to do this conveniently
+            entity.setOptions({
+                title: model.name,
+                position: new google.maps.LatLng(model.position[0], model.position[1])
+            });
+        },
+        destroy(model, entity) {
+            // `destroy` is called when you `dispose` your bound model, or it is removed from a bound collection.
+            // This lets you clean up your entity.
+            entity.setMap(null);
+        }
+    };
+}
 
-const poiMarkerLifecycle: EntityLifecycle<PointOfInterest, google.maps.Marker, void> = {
-    create(model) {
-        // `create` is called in order to create a Marker for your model. Note that `update` is always called immediately
-        // following `create` so the only code needed here is that specific to the creation of the entity, not necessarily
-        // the whole initialization
-        return new google.maps.Marker({ map: myMap });
-    },
-    update(model, entity) {
-        // The library will wrap `update` in an `autorun`, causing it to rerun every time the applicable parts of
-        // your model changes. Google Maps' Marker has a `setOptions` method which allows us to do this conveniently
-        entity.setOptions({
-            title: model.name,
-            position: new google.maps.LatLng(model.position[0], model.position[1])
-        });
-    },
-    destroy(model, entity) {
-        // `destroy` is called when you `dispose` your bound model, or it is removed from a bound collection.
-        // This lets you clean up your entity.
-        entity.setMap(null);
-    }
-};
+const poiMarkerLifecycle = createPoiMarkerLifecycle(new google.maps.Map(...));
 
 const myPoi = new PointOfInterest('Buckingham Palace', [51.501476, -0.140634]);
 bindModel(myPoi, poiMarkerLifecycle);
@@ -102,7 +101,7 @@ bindMap(myPois, poiMarkerLifecycle);
 setTimeout(() => myPois[1].name = 'Westminster', 1000);
 
 // Changing your collection will also automatically update your derived entities
-setTimeout(() => myPois.delete(1), 2000);
+setTimeout(() => myPois.delete('1'), 2000);
 setTimeout(() => myPois.set('4', new PointOfInterest('10 Downing Street', [51.503186, -0.126416])), 3000);
 ```
 
