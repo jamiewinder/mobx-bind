@@ -4,7 +4,11 @@ A small set of utilities for binding MobX observables and observable collections
 
 ## Principles:
 
-A 'model' is your data representation of a object, which typically contains MobX-observable properties. An 'entity' is something that is derived from your models, or more typically collections of your models.
+A 'model' is your data representation of a object, which typically contains MobX-observable properties.
+
+An 'entity' is something that is derived from your models, or more typically collections of your models.
+
+A 'lifecycle' is a description of how an entity is created, updated by a model, and destroyed.
 
 ## Use Case: Google Maps
 
