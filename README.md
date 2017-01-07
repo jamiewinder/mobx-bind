@@ -77,7 +77,11 @@ bindModel(myPoi, poiMarkerLifecycle);
 setTimeout(() => myPoi.name = "The Queen's House", 1000);
 ```
 
-Perhaps more useful is the ability to bind to a collection of models, which will automatically manage the creation and destruction of entities for those models. This can be done with either `IObservableArray`s or `ObservableMap`s using `bindArray` and `bindMap`.
+Perhaps more useful is the ability to bind to a collection of models, which will automatically manage the creation and destruction of entities for those models.
+
+This can be done with either `IObservableArray`s or `ObservableMap`s using either
+
+... `bindMap`
 
 ```typescript
 import { observable } from 'mobx';
@@ -98,7 +102,7 @@ setTimeout(() => myPois.delete(1), 2000);
 setTimeout(() => myPois.set('4', new PointOfInterest('10 Downing Street', [51.503186, -0.126416])), 3000);
 ```
 
-Or, with `bindArray`:
+... or `bindArray`:
 
 ```typescript
 import { observable } from 'mobx';
