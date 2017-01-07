@@ -98,7 +98,7 @@ const myPois = observable.shallowMap([
 bindMap(myPois, poiMarkerLifecycle);
 
 // Changing your model will automatically update your entity
-setTimeout(() => myPois[1].name = 'Westminster', 1000);
+setTimeout(() => myPois.get('1').name = 'Westminster', 1000);
 
 // Changing your collection will also automatically update your derived entities
 setTimeout(() => myPois.delete('1'), 2000);
