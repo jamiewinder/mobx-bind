@@ -14,7 +14,7 @@ export function bindMap<TModel, TEntity, TContext>(
     context?: TContext
 ): BindMapResult<TModel, TEntity> {
     const entityMap = Object.create(null) as { [key: string]: BindModelResult<TEntity> | undefined }
-    const createEntry = (key: string, model: TModel) => {
+    const createEntity = (key: string, model: TModel) => {
         if (key in entityMap) {
             console.warn('[mobx-bind] ignoring duplicate key: ', key);
         } else {
@@ -22,7 +22,7 @@ export function bindMap<TModel, TEntity, TContext>(
             entityMap[key] = boundEntity;
         }
     };
-    const destroyEntry = (key: string) => {
+    const destroyEntity = (key: string) => {
         const boundEntity = entityMap[key];
         if (boundEntity) {
             delete entityMap[key];
@@ -34,16 +34,16 @@ export function bindMap<TModel, TEntity, TContext>(
     const observeDisposer = observe(map, (change) => {
         switch (change.type) {
             case 'add':
-                createEntry(change.name, change.newValue);
+                createEntity(change.name, change.newValue);
                 break;
             case 'update':
-                destroyEntry(change.name);
-                createEntry(change.name, change.newValue);
+                destroyEntity(change.name);
+                createEntity(change.name, change.newValue);
             case 'delete':
-                destroyEntry(change.name);
+                destroyEntity(change.name);
         }
     });
-    map.entries().forEach(([key, model]) => createEntry(key, model));
+    map.entries().forEach(([key, model]) => createEntity(key, model));
 
     let disposed = false;
     return {

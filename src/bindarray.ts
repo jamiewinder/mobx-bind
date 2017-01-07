@@ -4,56 +4,46 @@ import { bindModel, BindModelResult } from './bindmodel';
 import { EntityLifecycle } from './entitylifecycle';
 
 export interface BindArrayResult<TModel, TEntity> {
-    getEntityByKey(key: string): TEntity | undefined;
+    getEntityByIndex(index: number): TEntity | undefined;
     dispose(): void;
 }
 
 export function bindArray<TModel, TEntity, TContext>(
     array: IObservableArray<TModel>,
     lifecycle: EntityLifecycle<TModel, TEntity, TContext>,
-    getKey: (model: TModel) => string,
     context?: TContext
 ): BindArrayResult<TModel, TEntity> {
-    const entityMap = Object.create(null) as { [key: string]: BindModelResult<TEntity> | undefined }
-    const createEntry = (model: TModel) => {
-        const key = getKey(model);
-        if (key in entityMap) {
-            console.warn('[mobx-bind] ignoring duplicate key: ', key);
-        } else {
-            const boundEntity = bindModel(model, lifecycle, context);
-            entityMap[key] = boundEntity;
-        }
+    const entityArray = [] as Array<BindModelResult<TEntity>>;
+    const spliceEntities = (start: number, deleteCount: number, insert: Array<TModel>) => {
+        const removing = entityArray.slice(start, deleteCount);
+        removing.forEach((entity) => entity.dispose());
+
+        const adding = insert.map((model) => bindModel(model, lifecycle, context));
+        entityArray.splice(start, deleteCount, ...adding);
     };
-    const destroyEntry = (model: TModel) => {
-        const key = getKey(model);
-        const boundEntity = entityMap[key];
-        if (boundEntity) {
-            delete entityMap[key];
-            boundEntity.dispose();
-        } else {
-            console.warn('[mobx-bind] missing entry!');
-        }
+    const updateEntity = (index: number, newModel: TModel) => {
+        entityArray[index].dispose();
+        entityArray[index] = bindModel(newModel, lifecycle, context);
     };
     const observeDisposer = observe(array, (change) => {
         switch (change.type) {
             case 'splice':
-                change.removed.forEach(destroyEntry);
-                change.added.forEach(createEntry);
+                spliceEntities(change.index, change.removedCount, change.added);
                 break;
             case 'update':
-                destroyEntry(change.oldValue);
-                createEntry(change.newValue);
+                updateEntity(change.index, change.newValue);
+                break;
         }
     });
-    array.forEach(createEntry);
+    spliceEntities(0, 0, array);
 
     let disposed = false;
     return {
-        getEntityByKey(key: string) {
+        getEntityByIndex(index: number) {
             if (disposed) {
                 throw new Error('[mobx-bind] bound collection disposed');
             }
-            const boundEntity = entityMap[key];
+            const boundEntity = entityArray[index];
             if (boundEntity) {
                 return boundEntity.getEntity();
             } else {
@@ -62,12 +52,7 @@ export function bindArray<TModel, TEntity, TContext>(
         },
         dispose: () => {
             if (!disposed) {
-                for (let key in entityMap) {
-                    const boundEntity = entityMap[key];
-                    if (boundEntity) {
-                        boundEntity.dispose();
-                    }
-                }
+                entityArray.forEach((boundEntity) => boundEntity.dispose());
                 observeDisposer();
                 disposed = true;
             }
