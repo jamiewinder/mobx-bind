@@ -1,0 +1,27 @@
+{
+  "name": "mobx-bind",
+  "version": "0.1.0",
+  "description": "Utility library for binding MobX observables and observable collections to generic entities",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "peerDependencies": {
+    "mobx": "^3.0.0-rc.1"
+  },
+  "devDependencies": {
+    "mobx": "^3.0.0-rc.1"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jamiewinder/mobx-bind.git"
+  },
+  "keywords": [
+    "mobx"
+  ],
+  "author": "Jamie Winder",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jamiewinder/mobx-bind/issues"
+  },
+  "homepage": "https://github.com/jamiewinder/mobx-bind#readme.md"
+}
