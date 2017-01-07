@@ -1,16 +1,18 @@
 {
     "compilerOptions": {
-        "target": "es5",
+        "target": "es2015",
         "outDir": "lib",
+        "declarationDir": "lib/typings",
         "sourceMap": false,
         "declaration": true,
-        "module": "commonjs",
+        "module": "es2015",
+        "moduleResolution": "node",
         "removeComments": false,
 		"strictNullChecks": true,
 		"noImplicitReturns": true,
 		"noImplicitUseStrict": true,
 		"noImplicitAny": true,
-		"lib": ["es5", "dom"]
+		"lib": ["es5", "es2015.iterable", "dom"]
     },
     "exclude": [
         "node_modules",

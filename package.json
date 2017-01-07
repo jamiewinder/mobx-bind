@@ -3,14 +3,17 @@
   "version": "0.1.0",
   "description": "Utility library for binding MobX observables and observable collections to generic entities",
   "main": "lib/index.js",
-  "typings": "lib/index.d.ts",
+  "typings": "lib/typings/index.d.ts",
   "peerDependencies": {
     "mobx": "^3.0.0-rc.1"
   },
   "devDependencies": {
-    "mobx": "^3.0.0-rc.1"
+    "mobx": "^3.0.0-rc.1",
+    "rollup": "^0.41.1"
   },
-  "scripts": {},
+  "scripts": {
+    "build": "tsc && rollup -c"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jamiewinder/mobx-bind.git"

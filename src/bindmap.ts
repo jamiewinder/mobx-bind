@@ -43,9 +43,7 @@ export function bindMap<TModel, TEntity, TContext>(
                 destroyEntry(change.name);
         }
     });
-    for (const [key, model] of map.entries()) {
-        createEntry(key, model);
-    }
+    map.entries().forEach(([key, model]) => createEntry(key, model));
 
     let disposed = false;
     return {
