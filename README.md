@@ -1,6 +1,6 @@
 # mobx-bind
 
-A small set of utilties for binding MobX observables and observable collections to generic entities
+A small set of utilities for binding MobX observables and observable collections to generic entities
 
 ## Principles:
 
