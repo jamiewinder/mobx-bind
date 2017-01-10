@@ -11,7 +11,7 @@ export interface BindMapResult<TModel, TEntity> {
 export function bindMap<TModel, TEntity, TContext>(
     map: ObservableMap<TModel>,
     lifecycle: EntityLifecycle<TModel, TEntity, TContext>,
-    context?: TContext
+    context: TContext
 ): BindMapResult<TModel, TEntity> {
     const entityMap = Object.create(null) as { [key: string]: BindModelResult<TEntity> | undefined }
     const createEntity = (key: string, model: TModel) => {

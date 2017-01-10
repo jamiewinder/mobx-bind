@@ -11,7 +11,7 @@ export interface BindArrayResult<TModel, TEntity> {
 export function bindArray<TModel, TEntity, TContext>(
     array: IObservableArray<TModel>,
     lifecycle: EntityLifecycle<TModel, TEntity, TContext>,
-    context?: TContext
+    context: TContext
 ): BindArrayResult<TModel, TEntity> {
     const entityArray = [] as Array<BindModelResult<TEntity>>;
     const spliceEntities = (start: number, deleteCount: number, insert: Array<TModel>) => {

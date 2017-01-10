@@ -10,12 +10,16 @@ export interface BindModelResult<TEntity> {
 export function bindModel<TModel, TEntity, TContext>(
     model: TModel,
     lifecycle: EntityLifecycle<TModel, TEntity, TContext>,
-    context?: TContext
+    context: TContext
 ): BindModelResult<TEntity> {
-    const entity = lifecycle.create(model, context);
-    const autorunDisposer = autorun(() => {
-        lifecycle.update(model, entity, context);
-    });
+    const { create, update, destroy } = lifecycle;
+    const updates = Array.isArray(update) ? update : [update];
+
+    const entity = create(model, context);
+    const autorunDisposers = updates.map((update) =>
+        autorun(() => update(model, entity, context)
+    ));
+
     let disposed = false;
     return {
         getEntity() {
@@ -26,8 +30,8 @@ export function bindModel<TModel, TEntity, TContext>(
         },
         dispose() {
             if (!disposed) {
-                lifecycle.destroy(model, entity, context);
-                autorunDisposer();
+                destroy(model, entity, context);
+                autorunDisposers.forEach((disposer) => disposer());
                 disposed = true;
             }
         }
