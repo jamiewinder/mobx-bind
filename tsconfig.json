@@ -1,11 +1,11 @@
 {
     "compilerOptions": {
-        "target": "es2015",
+        "target": "es5",
         "outDir": "lib",
         "declarationDir": "lib/typings",
         "sourceMap": false,
         "declaration": true,
-        "module": "es2015",
+        "module": "commonjs",
         "moduleResolution": "node",
         "removeComments": false,
 		"strictNullChecks": true,
