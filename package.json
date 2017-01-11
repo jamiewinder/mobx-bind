@@ -5,10 +5,10 @@
   "main": "lib/index.js",
   "typings": "lib/typings/index.d.ts",
   "peerDependencies": {
-    "mobx": "^3.0.0-rc.1"
+    "mobx": "^3.0.0"
   },
   "devDependencies": {
-    "mobx": "^3.0.0-rc.1",
+    "mobx": "^3.0.0",
     "webpack": "^2.2.0-rc.3"
   },
   "scripts": {
