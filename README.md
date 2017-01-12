@@ -1,6 +1,6 @@
 # mobx-bind
 
-A small set of utilities for binding MobX observables and observable collections to generic entities
+A small set of utilities for binding MobX observables and observable collections to generic entities. In the same way React maps your models to a DOM representation, this library can map your models to virtually any other representation implemented in other libraries. Read on for examples.
 
 ## Principles:
 
@@ -30,9 +30,9 @@ export interface EntityLifecycle<TModel, TEntity, TContext> {
 }
 ```
 
-## Use Case: Google Maps
+## Example Use Case: Google Maps
 
-The original purpose of these utilities was to bind models to Google Maps entities. For example, you may have a `PointOfInterest` model which you want to map to a Google Maps' `Marker`. The binding between the two can be defined with an `EntityLifecycle` object:
+The original purpose of this library was to bind models to Google Maps entities. For example, you may have a `PointOfInterest` model which you want to map to a Google Maps' `Marker`. The binding between the two can be defined with an `EntityLifecycle` object:
 
 ```typescript
 import { observable } from 'mobx';

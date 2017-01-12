@@ -7,7 +7,7 @@ export interface BindModelResult<TEntity> {
     dispose(): void;
 }
 
-function normalizeUpdates<T>(update: T | Array<T> | undefined) {
+function normalizeUpdate<T>(update: T | Array<T> | undefined) {
     if (Array.isArray(update)) {
         return update;
     } else if (update) {
@@ -23,7 +23,7 @@ export function bindModel<TModel, TEntity, TContext>(
     context: TContext
 ): BindModelResult<TEntity> {
     const { create, update, destroy } = lifecycle;
-    const updates = normalizeUpdates(update);
+    const updates = normalizeUpdate(update);
 
     const entity = create(model, context);
     const autorunDisposers = updates.map((update) =>
