@@ -1,10 +1,20 @@
 import { autorun } from 'mobx';
 
-import { EntityLifecycle } from './entitylifecycle';
+import { EntityLifecycle, EntityUpdate } from './entitylifecycle';
 
 export interface BindModelResult<TEntity> {
     getEntity(): TEntity;
     dispose(): void;
+}
+
+function normalizeUpdates<T>(update: T | Array<T> | undefined) {
+    if (Array.isArray(update)) {
+        return update;
+    } else if (update) {
+        return [update];
+    } else {
+        return [];
+    }
 }
 
 export function bindModel<TModel, TEntity, TContext>(
@@ -13,7 +23,7 @@ export function bindModel<TModel, TEntity, TContext>(
     context: TContext
 ): BindModelResult<TEntity> {
     const { create, update, destroy } = lifecycle;
-    const updates = Array.isArray(update) ? update : [update];
+    const updates = normalizeUpdates(update);
 
     const entity = create(model, context);
     const autorunDisposers = updates.map((update) =>
