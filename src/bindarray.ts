@@ -15,7 +15,7 @@ export function bindArray<TModel, TEntity, TContext>(
 ): BindArrayResult<TModel, TEntity> {
     const entityArray = [] as Array<BindModelResult<TEntity>>;
     const spliceEntities = (start: number, deleteCount: number, insert: Array<TModel>) => {
-        const removing = entityArray.slice(start, deleteCount);
+        const removing = entityArray.slice(start, start + deleteCount);
         removing.forEach((entity) => entity.dispose());
 
         const adding = insert.map((model) => bindModel(model, lifecycle, context));
