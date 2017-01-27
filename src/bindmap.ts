@@ -1,4 +1,4 @@
-import { observe, ObservableMap } from 'mobx';
+import { observe, reaction, isObservableMap, ObservableMap, Lambda } from 'mobx';
 
 import { bindModel, BindModelResult } from './bindmodel';
 import { EntityLifecycle } from './entitylifecycle';
@@ -9,7 +9,7 @@ export interface BindMapResult<TModel, TEntity> {
 }
 
 export function bindMap<TModel, TEntity, TContext>(
-    map: ObservableMap<TModel>,
+    map: ObservableMap<TModel> | Map<string, TModel>,
     lifecycle: EntityLifecycle<TModel, TEntity, TContext>,
     context: TContext
 ): BindMapResult<TModel, TEntity> {
@@ -31,19 +31,24 @@ export function bindMap<TModel, TEntity, TContext>(
             console.warn('[mobx-bind] missing entry!');
         }
     };
-    const observeDisposer = observe(map, (change) => {
-        switch (change.type) {
-            case 'add':
-                createEntity(change.name, change.newValue);
-                break;
-            case 'update':
-                destroyEntity(change.name);
-                createEntity(change.name, change.newValue);
-            case 'delete':
-                destroyEntity(change.name);
-        }
-    });
-    map.entries().forEach(([key, model]) => createEntity(key, model));
+    let observeDisposer: Lambda;
+    if (isObservableMap(map)) {
+        observeDisposer = observe(map, (change) => {
+            switch (change.type) {
+                case 'add':
+                    createEntity(change.name, change.newValue);
+                    break;
+                case 'update':
+                    destroyEntity(change.name);
+                    createEntity(change.name, change.newValue);
+                case 'delete':
+                    destroyEntity(change.name);
+            }
+        });
+    } else {
+        observeDisposer = () => null;
+    }
+    Array.from(map.entries()).forEach(([key, model]) => createEntity(key, model));
 
     let disposed = false;
     return {
@@ -71,4 +76,25 @@ export function bindMap<TModel, TEntity, TContext>(
             }
         }
     };
+}
+
+export function bindMapFn<TModel, TEntity, TContext>(
+    mapFn: () => ObservableMap<TModel> | Map<string, TModel>,
+    lifecycle: EntityLifecycle<TModel, TEntity, TContext>,
+    context: TContext
+): Lambda {
+    let disposeBoundArray: Lambda = () => null;
+    let disposeReaction = reaction(
+        () => mapFn(),
+        (map) => {
+            disposeBoundArray();
+            const boundArray = bindMap(map, lifecycle, context);
+            disposeBoundArray = () => boundArray.dispose();
+        },
+        { fireImmediately: true }
+    );
+    return () => {
+        disposeBoundArray();
+        disposeReaction();
+    }
 }

@@ -1,4 +1,4 @@
-import { observe, IObservableArray } from 'mobx';
+import { observe, reaction, isObservableArray, IObservableArray, Lambda } from 'mobx';
 
 import { bindModel, BindModelResult } from './bindmodel';
 import { EntityLifecycle } from './entitylifecycle';
@@ -9,7 +9,7 @@ export interface BindArrayResult<TModel, TEntity> {
 }
 
 export function bindArray<TModel, TEntity, TContext>(
-    array: IObservableArray<TModel>,
+    array: IObservableArray<TModel> | Array<TModel>,
     lifecycle: EntityLifecycle<TModel, TEntity, TContext>,
     context: TContext
 ): BindArrayResult<TModel, TEntity> {
@@ -25,16 +25,21 @@ export function bindArray<TModel, TEntity, TContext>(
         entityArray[index].dispose();
         entityArray[index] = bindModel(newModel, lifecycle, context);
     };
-    const observeDisposer = observe(array, (change) => {
-        switch (change.type) {
-            case 'splice':
-                spliceEntities(change.index, change.removedCount, change.added);
-                break;
-            case 'update':
-                updateEntity(change.index, change.newValue);
-                break;
-        }
-    });
+    let observeDisposer: Lambda;
+    if (isObservableArray(array)) {
+        observeDisposer = observe(array, (change) => {
+            switch (change.type) {
+                case 'splice':
+                    spliceEntities(change.index, change.removedCount, change.added);
+                    break;
+                case 'update':
+                    updateEntity(change.index, change.newValue);
+                    break;
+            }
+        });
+    } else {
+        observeDisposer = () => null;
+    }
     spliceEntities(0, 0, array);
 
     let disposed = false;
@@ -58,4 +63,25 @@ export function bindArray<TModel, TEntity, TContext>(
             }
         }
     };
+}
+
+export function bindArrayFn<TModel, TEntity, TContext>(
+    arrayFn: () => IObservableArray<TModel> | Array<TModel>,
+    lifecycle: EntityLifecycle<TModel, TEntity, TContext>,
+    context: TContext
+): Lambda {
+    let disposeBoundArray: Lambda = () => null;
+    let disposeReaction = reaction(
+        () => arrayFn(),
+        (array) => {
+            disposeBoundArray();
+            const boundArray = bindArray(array, lifecycle, context);
+            disposeBoundArray = () => boundArray.dispose();
+        },
+        { fireImmediately: true }
+    );
+    return () => {
+        disposeBoundArray();
+        disposeReaction();
+    }
 }
