@@ -21,8 +21,9 @@
     "lib/"
   ],
   "devDependencies": {
-    "mobx": "^3.0.0",
-    "webpack": "^2.2.0-rc.3"
+    "mobx": "^3.1.0",
+    "typescript": "^2.1.6",
+    "webpack": "^2.2.1"
   },
   "dependencies": {},
   "peerDependencies": {
