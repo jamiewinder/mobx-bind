@@ -9,7 +9,7 @@ export interface BindMapResult<TModel, TEntity> {
 }
 
 export function bindMap<TModel, TEntity, TContext>(
-    map: ObservableMap<TModel> | Map<string, TModel>,
+    map: ObservableMap<any, TModel> | Map<string, TModel>,
     lifecycle: EntityLifecycle<TModel, TEntity, TContext>,
     context: TContext
 ): BindMapResult<TModel, TEntity> {
@@ -79,7 +79,7 @@ export function bindMap<TModel, TEntity, TContext>(
 }
 
 export function bindMapFn<TModel, TEntity, TContext>(
-    mapFn: () => ObservableMap<TModel> | Map<string, TModel>,
+    mapFn: () => ObservableMap<any, TModel> | Map<string, TModel>,
     lifecycle: EntityLifecycle<TModel, TEntity, TContext>,
     context: TContext
 ): Lambda {

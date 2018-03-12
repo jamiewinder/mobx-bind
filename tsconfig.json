@@ -2,9 +2,9 @@
     "compilerOptions": {
         "target": "es5",
         "outDir": "lib",
+        "declaration": true,
         "declarationDir": "lib/typings",
         "sourceMap": false,
-        "declaration": true,
         "module": "commonjs",
         "moduleResolution": "node",
         "removeComments": false,
