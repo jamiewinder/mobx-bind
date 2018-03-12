@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "typings": "lib/typings/index.d.ts",
   "scripts": {
-    "build": "tsc && webpack"
+    "build": "tsc && rollup -c"
   },
   "repository": {
     "type": "git",
